@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Api", "Netenberg.Api\Netenberg.Api.csproj", "{EC1ADFD5-F230-4EBD-8718-4CA0C9CF3D6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.DataUpdater", "Netenberg.DataUpdater\Netenberg.DataUpdater.csproj", "{7D08BF06-9CA4-4A1C-8419-88A931664AC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Model", "Netenberg.Model\Netenberg.Model.csproj", "{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Database", "Netenberg.Database\Netenberg.Database.csproj", "{D7C8CA2E-A127-41C8-AADC-725BC1825834}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Application", "Netenberg.Application\Netenberg.Application.csproj", "{1EB3B806-824F-401C-831E-34FF6D46C543}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC1ADFD5-F230-4EBD-8718-4CA0C9CF3D6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC1ADFD5-F230-4EBD-8718-4CA0C9CF3D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC1ADFD5-F230-4EBD-8718-4CA0C9CF3D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC1ADFD5-F230-4EBD-8718-4CA0C9CF3D6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7C8CA2E-A127-41C8-AADC-725BC1825834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7C8CA2E-A127-41C8-AADC-725BC1825834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7C8CA2E-A127-41C8-AADC-725BC1825834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7C8CA2E-A127-41C8-AADC-725BC1825834}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EB3B806-824F-401C-831E-34FF6D46C543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EB3B806-824F-401C-831E-34FF6D46C543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EB3B806-824F-401C-831E-34FF6D46C543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EB3B806-824F-401C-831E-34FF6D46C543}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {78E04DEF-451B-4586-8B13-CDB22A19C594}
+	EndGlobalSection
+EndGlobal
