@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Database", "Neten
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Application", "Netenberg.Application\Netenberg.Application.csproj", "{1EB3B806-824F-401C-831E-34FF6D46C543}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Netenberg.Contracts", "Netenberg.Contracts\Netenberg.Contracts.csproj", "{F5254F38-E57D-4170-9DD9-F13F6388A9DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +41,10 @@ Global
 		{1EB3B806-824F-401C-831E-34FF6D46C543}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EB3B806-824F-401C-831E-34FF6D46C543}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EB3B806-824F-401C-831E-34FF6D46C543}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EB305B76-C9A5-4AB4-BEC3-E680D04DE9CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5254F38-E57D-4170-9DD9-F13F6388A9DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5254F38-E57D-4170-9DD9-F13F6388A9DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5254F38-E57D-4170-9DD9-F13F6388A9DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5254F38-E57D-4170-9DD9-F13F6388A9DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

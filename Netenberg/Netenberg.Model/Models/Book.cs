@@ -6,7 +6,7 @@ namespace Netenberg.Model.Models;
 public sealed class Book
 {
     [BsonId]
-    public required ObjectId _id { get; set; }
+    public required ObjectId Id { get; set; }
 
     [BsonElement("gutenbergId")]
     public required int GutenbergId { get; set; }
