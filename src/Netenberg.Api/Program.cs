@@ -59,6 +59,9 @@ app.MapGet("/books", async (
 
     return Results.Ok(response);
 })
+#if !DEBUG
+.AddEndpointFilter<ApiKeyAuthFilter>()
+# endif
 .WithName("GetBooks")
 .WithOpenApi();
 
@@ -71,6 +74,9 @@ app.MapGet("/books/{id}", async (int id, IBooksService booksService, Cancellatio
 
     return Results.Ok(mapper.Map<BookResponse>(book));
 })
+#if !DEBUG
+.AddEndpointFilter<ApiKeyAuthFilter>()
+# endif
 .WithName("GetBook")
 .WithOpenApi();
 

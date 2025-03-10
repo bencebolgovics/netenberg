@@ -57,11 +57,11 @@ public sealed class BookRepository : IBookRepository
             query = query.OrderByField(options.SortBy, options.SortingOrder);
         }
 
-        query = query.Skip(options.Page * options.PageSize).Take(options.PageSize);
+        query = query.Skip((options.Page - 1) * options.PageSize).Take(options.PageSize);
 
         return await query.ToListAsync(cancellationToken);
     }
-
+    
     public async Task<Book?> GetById(int id, CancellationToken cancellationToken)
     {
         return await _dbContext.Books.FirstOrDefaultAsync(b => b.GutenbergId == id, cancellationToken);

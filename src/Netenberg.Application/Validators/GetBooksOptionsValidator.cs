@@ -13,5 +13,7 @@ public sealed class GetBooksOptionsValidator : AbstractValidator<GetBooksOptions
         {
             return x is null || ValidSortingFields.Contains(x, StringComparer.OrdinalIgnoreCase);
         });
+
+        RuleFor(c => c.PageSize).InclusiveBetween(1, 40);
     }
 }
