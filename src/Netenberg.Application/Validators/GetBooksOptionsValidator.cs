@@ -9,11 +9,13 @@ public sealed class GetBooksOptionsValidator : AbstractValidator<GetBooksOptions
 
     public GetBooksOptionsValidator()
     {
-        RuleFor(c => c.SortBy).Must(x =>
+        RuleFor(c => c.SortBy)
+            .Must(x =>
         {
             return x is null || ValidSortingFields.Contains(x, StringComparer.OrdinalIgnoreCase);
         });
 
-        RuleFor(c => c.PageSize).InclusiveBetween(1, 40);
+        RuleFor(c => c.PageSize)
+            .InclusiveBetween(1, 40);
     }
 }

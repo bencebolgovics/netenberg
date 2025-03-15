@@ -43,7 +43,14 @@ app.MapGet("/books", async (
     IValidator<GetBooksOptions> validator,
     CancellationToken cancellationToken) =>
 {
-    var options = new GetBooksOptions() { Ids = ids, SortBy = sortBy?.Trim('+', '-'), SortingOrder = sortBy is null ? SortingOrder.Unsorted : sortBy.Trim().StartsWith('+') ? SortingOrder.Ascending : SortingOrder.Descending , Page = page, PageSize = pageSize};
+    var options = new GetBooksOptions()
+    {
+        Ids = ids,
+        SortBy = sortBy?.Trim('+', '-'),
+        SortingOrder = sortBy is null ? SortingOrder.Unsorted : sortBy.Trim().StartsWith('+') ? SortingOrder.Ascending : SortingOrder.Descending,
+        Page = page,
+        PageSize = pageSize
+    };
     
     var validationResult = validator.Validate(options);
 
@@ -55,7 +62,13 @@ app.MapGet("/books", async (
     var books = await booksService.GetBooks(options, cancellationToken);
     var count = await booksService.GetCountAsync(cancellationToken);
     
-    var response = new BooksResponse() { Items = books.Select(x => mapper.Map<BookResponse>(x)), Page = page, PageSize = pageSize, Total = count };
+    var response = new BooksResponse()
+    {
+        Items = books.Select(x => mapper.Map<BookResponse>(x)),
+        Page = page,
+        PageSize = pageSize,
+        Total = count
+    };
 
     return Results.Ok(response);
 })
