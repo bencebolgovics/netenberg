@@ -19,7 +19,7 @@ public static class QueryableExtensions
         var result = typeof(Queryable).GetMethods()
             .First(m => m.Name == methodName && m.GetParameters().Length == 2)
             .MakeGenericMethod(typeof(T), property.Type)
-            .Invoke(null, new object[] { query, lambda });
+            .Invoke(null, [query, lambda]);
 
         return (IQueryable<T>)result!;
     }

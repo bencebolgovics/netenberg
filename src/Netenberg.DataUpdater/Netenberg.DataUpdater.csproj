@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Netenberg.Database\Netenberg.Database.csproj" />
     <ProjectReference Include="..\Netenberg.Model\Netenberg.Model.csproj" />
   </ItemGroup>
 

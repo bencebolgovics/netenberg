@@ -1,6 +1,4 @@
-﻿using Netenberg.Contracts.Response;
-
-namespace Netenberg.Contracts.Responses;
+﻿namespace Netenberg.Contracts.Responses;
 
 public class PagedResponse<T> where T : class
 {

@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="14.0.0" />
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
@@ -16,6 +17,7 @@
     <ProjectReference Include="..\Netenberg.Application\Netenberg.Application.csproj" />
     <ProjectReference Include="..\Netenberg.Contracts\Netenberg.Contracts.csproj" />
     <ProjectReference Include="..\Netenberg.Database\Netenberg.Database.csproj" />
+    <ProjectReference Include="..\Netenberg.DataUpdater\Netenberg.DataUpdater.csproj" />
   </ItemGroup>
 
 </Project>

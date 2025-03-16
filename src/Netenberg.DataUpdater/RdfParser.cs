@@ -1,76 +1,108 @@
 ﻿using Netenberg.Model.Entities;
-using Netenberg.Model.Models;
-using VDS.RDF;
-using VDS.RDF.Parsing;
+using System.Xml.Linq;
 
 namespace Netenberg.DataUpdater;
 
-public static class RdfParser
+public class RdfParser
 {
-    public static Book ParseBookFromRdf(string filePath)
+    public static Book ParseRdfToBook(string filePath)
     {
-        Graph graph = new();
-        FileLoader.Load(graph, filePath);
+        XDocument doc = XDocument.Load(filePath);
 
-        var rdfType = graph.CreateUriNode(new Uri("http://www.w3.org/1999/02/22-rdf-syntax-ns#type"));
-        var ebookType = graph.CreateUriNode(new Uri("http://www.gutenberg.org/2009/pgterms/ebook"));
-        var titlePredicate = graph.CreateUriNode(new Uri("http://purl.org/dc/terms/title"));
-        var descriptionPredicate = graph.CreateUriNode(new Uri("http://purl.org/dc/terms/description"));
-        var creatorPredicate = graph.CreateUriNode(new Uri("http://purl.org/dc/terms/creator"));
-        var namePredicate = graph.CreateUriNode(new Uri("http://www.gutenberg.org/2009/pgterms/name"));
+        XNamespace rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+        XNamespace dcterms = "http://purl.org/dc/terms/";
+        XNamespace pgterms = "http://www.gutenberg.org/2009/pgterms/";
+        XNamespace dcam = "http://purl.org/dc/dcam/";
+        XNamespace cc = "http://web.resource.org/cc/";
 
-        var ebookTriple = graph.GetTriplesWithPredicateObject(rdfType, ebookType).FirstOrDefault();
+        var ebook = doc.Descendants(pgterms + "ebook").FirstOrDefault();
+        ArgumentNullException.ThrowIfNull(ebook);
 
-        ArgumentNullException.ThrowIfNull(ebookTriple);
-
-        var ebookNode = ebookTriple.Subject;
-
-        int gutenbergId = -1;
-
-        if (ebookNode is UriNode uriNode)
+#pragma warning disable CS8601 // Possible null reference assignment. (it's checked for null, but visual studio still gives me warnings :(
+        var bookData = new Dictionary<string, object>
         {
-            string uriStr = uriNode.Uri.ToString();
-            int idx = uriStr.IndexOf("ebooks/");
-            if (idx >= 0)
-            {
-                gutenbergId = Convert.ToInt32(uriStr[(idx + "ebooks/".Length)..]);
-            }
-            else
-            {
-                gutenbergId = Convert.ToInt32(uriStr);
-            }
-        }
-        else
+            ["ID"] = ebook.Attribute(rdf + "about")?.Value.Split('/').Last(),
+            ["Title"] = ebook.Element(dcterms + "title")?.Value,
+            ["Publisher"] = ebook.Element(dcterms + "publisher")?.Value,
+            ["PublicationDate"] = ebook.Element(dcterms + "issued")?.Value,
+            ["Downloads"] = ebook.Element(pgterms + "downloads")?.Value,
+            ["Rights"] = ebook.Element(dcterms + "rights")?.Value,
+            ["Language"] = ebook.Element(dcterms + "language")?
+                .Element(rdf + "Description")?
+                .Element(rdf + "value")?.Value,
+            ["Descriptions"] = ebook.Elements(dcterms + "description")
+                .Select(d => d.Value.Trim())
+                .ToList(),
+            ["Subjects"] = ebook.Elements(dcterms + "subject")
+                .Select(s => s.Element(rdf + "Description")?.Element(rdf + "value")?.Value)
+                .Where(value => value != null)
+                .ToList(),
+            ["Urls"] = ebook.Elements(dcterms + "hasFormat")
+                .Select(f => f.Element(pgterms + "file")?.Attribute(rdf + "about")?.Value)
+                .Where(url => url != null)
+                .ToList(),
+            ["Bookshelves"] = ebook.Elements(pgterms + "bookshelf")
+                .Select(b => b.Element(rdf + "Description")?
+                    .Element(rdf + "value")?.Value)
+                .ToList(),
+            ["Creators"] = ebook.Elements(dcterms + "creator")
+                .Select(c => GetCreatorInfo(c.Element(pgterms + "agent"), pgterms, rdf))
+                .Where(creator => creator != null) // Filter out null values
+                .ToList(),
+        };
+
+#pragma warning disable CS8604 // Possible null reference argument.
+        return new Book()
         {
-            gutenbergId = Convert.ToInt32(ebookNode.ToString());
-        }
+            GutenbergId = Convert.ToInt32(bookData["ID"]),
+            Title = bookData["Title"]?.ToString(),
+            Publisher = bookData["Publisher"]?.ToString(),
+            PublicationDate = DateTime.Parse(bookData["PublicationDate"]?.ToString()),
+            Descriptions = bookData["Descriptions"] as List<string>,
+            Rights = bookData["Rights"]?.ToString(),
+            Subjects = bookData["Subjects"] as List<string>,
+            Language = bookData["Language"]?.ToString(),
+            Downloads = Convert.ToInt32(bookData["Downloads"]),
+            Urls = bookData["Urls"] as List<string>,
+            Bookshelves = bookData["Bookshelves"] as List<string>,
+            Authors = ToAuthors(bookData["Creators"] as List<Dictionary<string, object>>),
+        };
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8601 // Possible null reference assignment.
+    }
 
-        var titleTriple = graph.GetTriplesWithSubjectPredicate(ebookNode, titlePredicate).FirstOrDefault();
-        string title = "asd";
+    private static Dictionary<string, object> GetCreatorInfo(XElement creator, XNamespace pgterms, XNamespace rdf)
+    {
+        if (creator == null)
+            return null;
 
-        var descriptionTriples = graph.GetTriplesWithSubjectPredicate(ebookNode, descriptionPredicate).ToList();
-        string description = string.Join("\n", descriptionTriples
-            .Select(triple => triple.Object is LiteralNode lit ? lit.Value : string.Empty)
-            .Where(s => !string.IsNullOrEmpty(s)));
-
-        string authorName = string.Empty;
-        var creatorTriple = graph.GetTriplesWithSubjectPredicate(ebookNode, creatorPredicate).FirstOrDefault();
-        if (creatorTriple != null)
+        return new Dictionary<string, object>
         {
-            var agentNode = creatorTriple.Object;
-            var nameTriple = graph.GetTriplesWithSubjectPredicate(agentNode, namePredicate).FirstOrDefault();
-            if (nameTriple != null && nameTriple.Object is LiteralNode nameLiteral)
-            {
-                authorName = nameLiteral.Value;
-            }
-        }
+            ["Name"] = creator.Element(pgterms + "name")?.Value,
+            ["BirthYear"] = creator.Element(pgterms + "birthdate")?.Value,
+            ["DeathYear"] = creator.Element(pgterms + "deathdate")?.Value,
+            ["Alias"] = creator.Element(pgterms + "alias")?.Value,
+            ["Webpage"] = creator.Element(pgterms + "webpage")?.Attribute(rdf + "resource")?.Value
+        };
+    }
 
-        return new Book
+    private static List<Author> ToAuthors(List<Dictionary<string, object>> authors)
+    {
+        if (authors is null)
+            return [];
+
+        return authors.Select(ToAuthor).ToList();
+    }
+
+    private static Author ToAuthor(Dictionary<string, object> author)
+    {
+        return new Author()
         {
-            GutenbergId = gutenbergId,
-            Title = title,
-            Description = description,
-            Authors = []
+            Name = author["Name"]?.ToString(),
+            Alias = author["Alias"]?.ToString(),
+            BirthYear = Convert.ToInt32(author["BirthYear"]),
+            DeathYear = Convert.ToInt32(author["DeathYear"]),
+            Webpage = author["Webpage"]?.ToString()
         };
     }
 }

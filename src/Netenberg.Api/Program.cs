@@ -3,8 +3,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Netenberg.Application.Services;
 using Netenberg.Application.Validators;
-using Netenberg.Contracts.Response;
+using Netenberg.Contracts.Responses;
 using Netenberg.Database.Repositories;
+using Netenberg.DataUpdater;
 using Netenberg.Model.Entities;
 using Netenberg.Model.Enums;
 using Netenberg.Model.Models;
@@ -24,6 +25,8 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IReadOnlyBookRepository, BookRepository>();
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IValidator<GetBooksOptions>, GetBooksOptionsValidator>();
+builder.Services.AddLogging(x => x.AddConsole());
+builder.Services.AddScoped<DataUpdaterService>();
 
 var app = builder.Build();
 
@@ -91,6 +94,18 @@ app.MapGet("/books/{id}", async (int id, IBooksService booksService, Cancellatio
 .AddEndpointFilter<ApiKeyAuthFilter>()
 # endif
 .WithName("GetBook")
+.WithOpenApi();
+
+app.MapGet("/update", async (DataUpdaterService dataUpdaterService, CancellationToken cancellationToken) =>
+{
+    await dataUpdaterService.UpdateDatabase(cancellationToken);
+
+    return Results.Ok();
+})
+#if !DEBUG
+.AddEndpointFilter<ApiKeyAuthFilter>()
+# endif
+.WithName("Update")
 .WithOpenApi();
 
 app.Run();

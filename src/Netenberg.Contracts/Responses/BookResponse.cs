@@ -1,6 +1,6 @@
 ﻿using Netenberg.Model.Entities;
 
-namespace Netenberg.Contracts.Response;
+namespace Netenberg.Contracts.Responses;
 
 public sealed record BookResponse
 {
