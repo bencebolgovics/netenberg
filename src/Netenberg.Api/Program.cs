@@ -1,9 +1,12 @@
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using Netenberg.Application.Services;
 using Netenberg.Application.Validators;
 using Netenberg.Contracts.Responses;
+using Netenberg.Database.DatabaseContext;
 using Netenberg.Database.Repositories;
 using Netenberg.DataUpdater;
 using Netenberg.Model.Entities;
@@ -27,6 +30,14 @@ builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IValidator<GetBooksOptions>, GetBooksOptionsValidator>();
 builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.AddScoped<DataUpdaterService>();
+builder.Services.AddDbContextPool<NetenbergContext>(options =>
+{
+    string connectionString = "mongodb+srv://bencebolgovics:qfnWAeMbUhibP5Q@netenberg.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000";
+    string databaseName = "netenberg";
+
+    var client = new MongoClient(connectionString);
+    options.UseMongoDB(client, databaseName);
+});
 
 var app = builder.Build();
 

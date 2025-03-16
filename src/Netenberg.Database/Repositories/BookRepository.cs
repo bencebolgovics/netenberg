@@ -10,15 +10,10 @@ namespace Netenberg.Database.Repositories;
 public sealed class BookRepository : IBookRepository
 {
     private readonly NetenbergContext _dbContext;
-    string connectionString = "mongodb+srv://bencebolgovics:qfnWAeMbUhibP5Q@netenberg.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000";
-    string databaseName = "netenberg";
 
-    public BookRepository()
+    public BookRepository(NetenbergContext dbContext)
     {
-        var client = new MongoClient(connectionString);
-        var dbContextOptions = new DbContextOptionsBuilder<NetenbergContext>()
-            .UseMongoDB(client, databaseName).Options;
-        _dbContext = new NetenbergContext(dbContextOptions);
+        _dbContext = dbContext;
     }
 
     public async Task<Book> Create(Book entity, CancellationToken cancellationToken)
@@ -32,6 +27,7 @@ public sealed class BookRepository : IBookRepository
     public async Task<IEnumerable<Book>> CreateMany(IEnumerable<Book> entities, CancellationToken cancellationToken)
     {
         await _dbContext.Books.AddRangeAsync(entities, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return entities;
     }
@@ -65,6 +61,11 @@ public sealed class BookRepository : IBookRepository
     public async Task<Book?> GetById(int id, CancellationToken cancellationToken)
     {
         return await _dbContext.Books.FirstOrDefaultAsync(b => b.GutenbergId == id, cancellationToken);
+    }
+
+    public async Task<bool> Exists(int id, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Books.AnyAsync(b => b.GutenbergId == id, cancellationToken);
     }
 
     public async Task<int> GetCountAsync(CancellationToken cancellationToken)

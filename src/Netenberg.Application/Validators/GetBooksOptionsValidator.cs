@@ -5,7 +5,7 @@ namespace Netenberg.Application.Validators;
 
 public sealed class GetBooksOptionsValidator : AbstractValidator<GetBooksOptions>
 {
-    private static readonly string[] ValidSortingFields = ["id", "title", "author"];
+    private static readonly string[] ValidSortingFields = ["id", "title", "downloads", "publicationDate"];
 
     public GetBooksOptionsValidator()
     {

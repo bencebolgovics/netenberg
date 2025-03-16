@@ -18,7 +18,6 @@ public class RdfParser
         var ebook = doc.Descendants(pgterms + "ebook").FirstOrDefault();
         ArgumentNullException.ThrowIfNull(ebook);
 
-#pragma warning disable CS8601 // Possible null reference assignment. (it's checked for null, but visual studio still gives me warnings :(
         var bookData = new Dictionary<string, object>
         {
             ["ID"] = ebook.Attribute(rdf + "about")?.Value.Split('/').Last(),
@@ -51,27 +50,24 @@ public class RdfParser
                 .ToList(),
         };
 
-#pragma warning disable CS8604 // Possible null reference argument.
         return new Book()
         {
             GutenbergId = Convert.ToInt32(bookData["ID"]),
             Title = bookData["Title"]?.ToString(),
             Publisher = bookData["Publisher"]?.ToString(),
-            PublicationDate = DateTime.Parse(bookData["PublicationDate"]?.ToString()),
-            Descriptions = bookData["Descriptions"] as List<string>,
-            Rights = bookData["Rights"]?.ToString(),
-            Subjects = bookData["Subjects"] as List<string>,
-            Language = bookData["Language"]?.ToString(),
+            PublicationDate = bookData["PublicationDate"] is not null ? DateTime.Parse(bookData["PublicationDate"].ToString()!) : null,
+            Descriptions = bookData["Descriptions"] as List<string> ?? [],
+            Rights = bookData["Rights"]?.ToString() ?? string.Empty,
+            Subjects = bookData["Subjects"] as List<string> ?? [],
+            Language = bookData["Language"]?.ToString() ?? string.Empty,
             Downloads = Convert.ToInt32(bookData["Downloads"]),
-            Urls = bookData["Urls"] as List<string>,
-            Bookshelves = bookData["Bookshelves"] as List<string>,
-            Authors = ToAuthors(bookData["Creators"] as List<Dictionary<string, object>>),
+            Urls = bookData["Urls"] as List<string> ?? [],
+            Bookshelves = bookData["Bookshelves"] as List<string> ?? [],
+            Authors = ToAuthors(bookData["Creators"] as List<Dictionary<string, object>> ?? []),
         };
-#pragma warning restore CS8604 // Possible null reference argument.
-#pragma warning restore CS8601 // Possible null reference assignment.
     }
 
-    private static Dictionary<string, object> GetCreatorInfo(XElement creator, XNamespace pgterms, XNamespace rdf)
+    private static Dictionary<string, object>? GetCreatorInfo(XElement creator, XNamespace pgterms, XNamespace rdf)
     {
         if (creator == null)
             return null;
@@ -100,8 +96,8 @@ public class RdfParser
         {
             Name = author["Name"]?.ToString(),
             Alias = author["Alias"]?.ToString(),
-            BirthYear = Convert.ToInt32(author["BirthYear"]),
-            DeathYear = Convert.ToInt32(author["DeathYear"]),
+            BirthYear = author["BirthYear"] is not null ? Convert.ToInt32(author["BirthYear"]) : null,
+            DeathYear = author["DeathYear"] is not null ? Convert.ToInt32(author["DeathYear"]) : null,
             Webpage = author["Webpage"]?.ToString()
         };
     }
