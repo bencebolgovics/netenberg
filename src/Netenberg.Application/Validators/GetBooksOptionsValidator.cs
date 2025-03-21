@@ -12,7 +12,7 @@ public sealed class GetBooksOptionsValidator : AbstractValidator<GetBooksOptions
         RuleFor(c => c.SortBy)
             .Must(x =>
         {
-            return x is null || ValidSortingFields.Contains(x, StringComparer.OrdinalIgnoreCase);
+            return string.IsNullOrEmpty(x) || ValidSortingFields.Contains(x, StringComparer.OrdinalIgnoreCase);
         });
 
         RuleFor(c => c.PageSize)

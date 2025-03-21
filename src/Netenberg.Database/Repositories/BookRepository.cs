@@ -42,13 +42,13 @@ public sealed class BookRepository : IBookRepository
     {
         IQueryable<Book> query = _dbContext.Books;
 
-        if (options.Ids is not null)
+        if (!string.IsNullOrEmpty(options.Ids))
         {
             var ids = options.Ids.Split(',').Select(id => Convert.ToInt32(id));
             query = query.Where(x => ids.Contains(x.GutenbergId));
         }
 
-        if (options.SortBy is not null)
+        if (!string.IsNullOrEmpty(options.SortBy))
         {
             query = query.OrderByField(options.SortBy, options.SortingOrder);
         }

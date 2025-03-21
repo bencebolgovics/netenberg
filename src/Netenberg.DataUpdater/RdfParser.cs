@@ -87,7 +87,7 @@ public class RdfParser
         if (authors is null)
             return [];
 
-        return authors.Select(ToAuthor).ToList();
+        return [.. authors.Select(ToAuthor)];
     }
 
     private static Author ToAuthor(Dictionary<string, object> author)
