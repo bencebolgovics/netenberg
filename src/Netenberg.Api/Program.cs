@@ -1,8 +1,10 @@
+using System.Threading.RateLimiting;
 using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
+using Netenberg.Api.Auth;
 using Netenberg.Application.Services;
 using Netenberg.Application.Validators;
 using Netenberg.Contracts.Responses;
@@ -43,9 +45,44 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
-              .AllowAnyMethod()
+              .WithMethods("GET")
               .AllowAnyHeader();
     });
+
+    options.AddPolicy("PublicApiWithKey", policy =>
+    {
+      policy.AllowAnyOrigin()
+            .WithMethods("GET")
+            .WithHeaders(AuthConstants.ApiKeyHeaderName)
+            .SetPreflightMaxAge(TimeSpan.FromHours(1));
+    });
+});
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.AddPolicy<string>("ApiKeyRateLimit", context =>
+    {
+        if (!context.Request.Headers.TryGetValue(AuthConstants.ApiKeyHeaderName, out var apiKey))
+            return RateLimitPartition.GetNoLimiter("missing-key");
+
+        return RateLimitPartition.GetSlidingWindowLimiter<string>(
+            partitionKey: apiKey!,
+            factory: _ => new SlidingWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromHours(1),
+                SegmentsPerWindow = 5
+            });
+    });
+
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.StatusCode = 429;
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            Error = "Too many requests",
+        }, token);
+    };
 });
 
 var app = builder.Build();
@@ -56,7 +93,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors();
+app.UseMiddleware<ApiKeyAuthMiddleware>();
+app.UseRateLimiter();
 
 app.MapGet("/books", async (
     [FromQuery] string? ids,
@@ -96,9 +135,8 @@ app.MapGet("/books", async (
 
     return Results.Ok(response);
 })
-#if !DEBUG
-.AddEndpointFilter<ApiKeyAuthFilter>()
-# endif
+.RequireCors("PublicApiWithKey")
+.RequireRateLimiting("ApiKeyRateLimit")
 .WithName("GetBooks")
 .WithOpenApi();
 
@@ -111,22 +149,9 @@ app.MapGet("/books/{id}", async (int id, IBooksService booksService, Cancellatio
 
     return Results.Ok(mapper.Map<BookResponse>(book));
 })
-#if !DEBUG
-.AddEndpointFilter<ApiKeyAuthFilter>()
-# endif
+.RequireCors("PublicApiWithKey")
+.RequireRateLimiting("ApiKeyRateLimit")
 .WithName("GetBook")
-.WithOpenApi();
-
-app.MapGet("/update", async (DataUpdaterService dataUpdaterService, CancellationToken cancellationToken) =>
-{
-    await dataUpdaterService.UpdateDatabase(cancellationToken);
-
-    return Results.Ok();
-})
-#if !DEBUG
-.AddEndpointFilter<ApiKeyAuthFilter>()
-# endif
-.WithName("Update")
 .WithOpenApi();
 
 app.Run();
