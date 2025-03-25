@@ -17,17 +17,14 @@ using Netenberg.Model.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var configuration = new MapperConfiguration(cfg =>
-{
-    cfg.CreateMap<Book, BookResponse>()
-        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.GutenbergId));
-});
-
-var mapper = configuration.CreateMapper();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddAutoMapper(config => {
+    config.CreateMap<Book, BookResponse>()
+        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.GutenbergId));
+});
 builder.Services.AddScoped<IReadOnlyBookRepository, BookRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IValidator<GetBooksOptions>, GetBooksOptionsValidator>();
 builder.Services.AddLogging(x => x.AddConsole());
@@ -42,6 +39,7 @@ builder.Services.AddDbContextPool<NetenbergContext>(options =>
 });
 builder.Services.AddCors(options =>
 {
+    //for testing purposes
     options.AddPolicy("AllowAll", policy =>
     {
         policy.AllowAnyOrigin()
@@ -93,7 +91,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseCors("PublicApiWithKey");
 app.UseMiddleware<ApiKeyAuthMiddleware>();
 app.UseRateLimiter();
 
@@ -103,6 +101,7 @@ app.MapGet("/books", async (
     [FromQuery] int page,
     [FromQuery] int pageSize,
     IBooksService booksService,
+    IMapper mapper,
     IValidator<GetBooksOptions> validator,
     CancellationToken cancellationToken) =>
 {
@@ -135,12 +134,11 @@ app.MapGet("/books", async (
 
     return Results.Ok(response);
 })
-.RequireCors("PublicApiWithKey")
 .RequireRateLimiting("ApiKeyRateLimit")
 .WithName("GetBooks")
 .WithOpenApi();
 
-app.MapGet("/books/{id}", async (int id, IBooksService booksService, CancellationToken cancellationToken) =>
+app.MapGet("/books/{id}", async (int id, IMapper mapper, IBooksService booksService, CancellationToken cancellationToken) =>
 {
     var book = await booksService.GetBook(id, cancellationToken);
     
@@ -149,7 +147,6 @@ app.MapGet("/books/{id}", async (int id, IBooksService booksService, Cancellatio
 
     return Results.Ok(mapper.Map<BookResponse>(book));
 })
-.RequireCors("PublicApiWithKey")
 .RequireRateLimiting("ApiKeyRateLimit")
 .WithName("GetBook")
 .WithOpenApi();

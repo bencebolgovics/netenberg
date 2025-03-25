@@ -1,6 +1,6 @@
 ﻿namespace Netenberg.Api.Auth;
 
-public class ApiKeyAuthMiddleware
+public sealed class ApiKeyAuthMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ApiKeyAuthMiddleware> _logger;
