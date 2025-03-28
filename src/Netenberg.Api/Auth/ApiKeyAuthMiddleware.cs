@@ -13,7 +13,7 @@ public sealed class ApiKeyAuthMiddleware
         _logger = logger;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {
         var apiKey = context.Request.Headers[AuthConstants.ApiKeyHeaderName].FirstOrDefault();
 
@@ -24,7 +24,7 @@ public sealed class ApiKeyAuthMiddleware
             return;
         }
 
-        if (apiKey != "asd")
+        if (apiKey == configuration["PRIVATE_API_KEY"])
         {
             _logger.LogWarning("Invalid API Key attempt: {Key}", apiKey);
             context.Response.StatusCode = 403;

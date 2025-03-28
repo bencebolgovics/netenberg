@@ -31,7 +31,7 @@ builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.AddScoped<DataUpdaterService>();
 builder.Services.AddDbContextPool<NetenbergContext>(options =>
 {
-    string connectionString = "mongodb+srv://bencebolgovics:qfnWAeMbUhibP5Q@netenberg.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000";
+    string connectionString = builder.Configuration["COSMOS_DB_CONNECTION_STRING"]!;
     string databaseName = "netenberg";
 
     var client = new MongoClient(connectionString);
@@ -39,7 +39,7 @@ builder.Services.AddDbContextPool<NetenbergContext>(options =>
 });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("PublicApiWithKey", policy =>
+    options.AddPolicy("WithApiKey", policy =>
     {
       policy.AllowAnyOrigin()
             .WithMethods("GET")
@@ -54,6 +54,18 @@ builder.Services.AddRateLimiter(options =>
     {
         if (!context.Request.Headers.TryGetValue(AuthConstants.ApiKeyHeaderName, out var apiKey))
             return RateLimitPartition.GetNoLimiter("missing-key");
+        
+        if (apiKey == builder.Configuration["PRIVATE_API_KEY"])
+        {
+            return RateLimitPartition.GetSlidingWindowLimiter<string>(
+                partitionKey: apiKey!,
+                factory: _ => new SlidingWindowRateLimiterOptions
+                {
+                    PermitLimit = 1000,
+                    Window = TimeSpan.FromHours(1),
+                    SegmentsPerWindow = 5
+                });
+        }
 
         return RateLimitPartition.GetSlidingWindowLimiter<string>(
             partitionKey: apiKey!,
@@ -83,7 +95,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
-app.UseCors("PublicApiWithKey");
+app.UseCors("WithApiKey");
 app.UseMiddleware<ApiKeyAuthMiddleware>();
 app.UseRateLimiter();
 
