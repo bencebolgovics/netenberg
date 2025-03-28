@@ -31,7 +31,7 @@ builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.AddScoped<DataUpdaterService>();
 builder.Services.AddDbContextPool<NetenbergContext>(options =>
 {
-    string connectionString = builder.Configuration["COSMOS_DB_CONNECTION_STRING"]!;
+    string connectionString = builder.Configuration.GetConnectionString("COSMOS_DB_CONNECTION_STRING")!;
     string databaseName = "netenberg";
 
     var client = new MongoClient(connectionString);
