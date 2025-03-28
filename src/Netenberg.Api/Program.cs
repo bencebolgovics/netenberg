@@ -39,14 +39,6 @@ builder.Services.AddDbContextPool<NetenbergContext>(options =>
 });
 builder.Services.AddCors(options =>
 {
-    //for testing purposes
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .WithMethods("GET")
-              .AllowAnyHeader();
-    });
-
     options.AddPolicy("PublicApiWithKey", policy =>
     {
       policy.AllowAnyOrigin()
