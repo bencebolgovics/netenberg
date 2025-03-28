@@ -102,8 +102,8 @@ app.UseRateLimiter();
 app.MapGet("/books", async (
     [FromQuery] string? ids,
     [FromQuery] string? sortBy,
-    [FromQuery] int page,
-    [FromQuery] int pageSize,
+    [FromQuery] int? page,
+    [FromQuery] int? pageSize,
     IBooksService booksService,
     IMapper mapper,
     IValidator<GetBooksOptions> validator,
@@ -114,8 +114,8 @@ app.MapGet("/books", async (
         Ids = ids,
         SortBy = sortBy?.Trim('+', '-'),
         SortingOrder = sortBy is null ? SortingOrder.Unsorted : sortBy.Trim().StartsWith('+') ? SortingOrder.Ascending : SortingOrder.Descending,
-        Page = page,
-        PageSize = pageSize
+        Page = page ?? 1,
+        PageSize = pageSize ?? 30
     };
     
     var validationResult = validator.Validate(options);
@@ -131,8 +131,8 @@ app.MapGet("/books", async (
     var response = new BooksResponse()
     {
         Items = books.Select(x => mapper.Map<BookResponse>(x)),
-        Page = page,
-        PageSize = pageSize,
+        Page = options.Page,
+        PageSize = options.PageSize,
         Total = count
     };
 
