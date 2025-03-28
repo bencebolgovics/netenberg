@@ -23,7 +23,7 @@ jobs:
       - name: Build with dotnet
         run: |
           cd src/
-          dotnet build --configuration Release
+          dotnet build --configuration Release -o "${{env.DOTNET_ROOT}}/myapp"
 
       - name: dotnet publish
         run: dotnet publish -c Release -o "${{env.DOTNET_ROOT}}/myapp"
