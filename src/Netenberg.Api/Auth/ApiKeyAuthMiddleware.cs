@@ -24,7 +24,7 @@ public sealed class ApiKeyAuthMiddleware
             return;
         }
 
-        if (apiKey == configuration["PRIVATE_API_KEY"])
+        if (apiKey != configuration["PRIVATE_API_KEY"])
         {
             _logger.LogWarning("Invalid API Key attempt: {Key}", apiKey);
             context.Response.StatusCode = 403;
