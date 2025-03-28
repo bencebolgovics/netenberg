@@ -4,16 +4,19 @@ public sealed class ApiKeyAuthMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<ApiKeyAuthMiddleware> _logger;
+    private readonly IConfiguration _configuration;
 
     public ApiKeyAuthMiddleware(
         RequestDelegate next,
-        ILogger<ApiKeyAuthMiddleware> logger)
+        ILogger<ApiKeyAuthMiddleware> logger,
+        IConfiguration configuration)
     {
         _next = next;
         _logger = logger;
+        _configuration = configuration;
     }
 
-    public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
+    public async Task InvokeAsync(HttpContext context)
     {
         var apiKey = context.Request.Headers[AuthConstants.ApiKeyHeaderName].FirstOrDefault();
 
@@ -24,7 +27,7 @@ public sealed class ApiKeyAuthMiddleware
             return;
         }
 
-        if (apiKey != configuration["PRIVATE_API_KEY"])
+        if (apiKey != _configuration["PRIVATE_API_KEY"])
         {
             _logger.LogWarning("Invalid API Key attempt: {Key}", apiKey);
             context.Response.StatusCode = 403;
