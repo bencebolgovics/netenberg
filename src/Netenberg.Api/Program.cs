@@ -1,34 +1,29 @@
-using System.Threading.RateLimiting;
-using AutoMapper;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using Netenberg.Api.Auth;
+using Netenberg.Api.Mapper;
+using Netenberg.Api.Validation;
 using Netenberg.Application.Services;
 using Netenberg.Application.Validators;
-using Netenberg.Contracts.Responses;
 using Netenberg.Database.DatabaseContext;
 using Netenberg.Database.Repositories;
 using Netenberg.DataUpdater;
-using Netenberg.Model.Entities;
-using Netenberg.Model.Enums;
 using Netenberg.Model.Models;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddAutoMapper(config => {
-    config.CreateMap<Book, BookResponse>()
-        .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.GutenbergId));
-});
 builder.Services.AddScoped<IReadOnlyBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBooksService, BooksService>();
 builder.Services.AddScoped<IValidator<GetBooksOptions>, GetBooksOptionsValidator>();
 builder.Services.AddLogging(x => x.AddConsole());
 builder.Services.AddScoped<DataUpdaterService>();
+builder.Services.AddOutputCache();
+
 builder.Services.AddDbContextPool<NetenbergContext>(options =>
 {
     string connectionString = builder.Configuration["COSMOS_DB_CONNECTION_STRING"]!;
@@ -37,6 +32,7 @@ builder.Services.AddDbContextPool<NetenbergContext>(options =>
     var client = new MongoClient(connectionString);
     options.UseMongoDB(client, databaseName);
 });
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("WithApiKey", policy =>
@@ -50,28 +46,21 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddRateLimiter(options =>
 {
-    options.AddPolicy<string>("ApiKeyRateLimit", context =>
+    options.AddPolicy("ApiKeyRateLimit", context =>
     {
         if (!context.Request.Headers.TryGetValue(AuthConstants.ApiKeyHeaderName, out var apiKey))
             return RateLimitPartition.GetNoLimiter("missing-key");
         
         if (apiKey == builder.Configuration["PRIVATE_API_KEY"])
         {
-            return RateLimitPartition.GetSlidingWindowLimiter<string>(
-                partitionKey: apiKey!,
-                factory: _ => new SlidingWindowRateLimiterOptions
-                {
-                    PermitLimit = 1000,
-                    Window = TimeSpan.FromHours(1),
-                    SegmentsPerWindow = 5
-                });
+            return RateLimitPartition.GetNoLimiter<string>(apiKey!);
         }
 
         return RateLimitPartition.GetSlidingWindowLimiter<string>(
             partitionKey: apiKey!,
             factory: _ => new SlidingWindowRateLimiterOptions
             {
-                PermitLimit = 10,
+                PermitLimit = 100,
                 Window = TimeSpan.FromHours(1),
                 SegmentsPerWindow = 5
             });
@@ -87,6 +76,12 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+builder.Services.AddOutputCache(options =>
+{
+    options.AddPolicy("ShortTerm", policy =>
+        policy.Expire(TimeSpan.FromSeconds(30)));
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -98,60 +93,35 @@ app.UseHttpsRedirection();
 app.UseCors("WithApiKey");
 app.UseMiddleware<ApiKeyAuthMiddleware>();
 app.UseRateLimiter();
+app.UseOutputCache();
 
 app.MapGet("/books", async (
-    [FromQuery] string? ids,
-    [FromQuery] string? sortBy,
-    [FromQuery] int? page,
-    [FromQuery] int? pageSize,
+    [AsParameters] GetBooksOptions options,
     IBooksService booksService,
-    IMapper mapper,
-    IValidator<GetBooksOptions> validator,
     CancellationToken cancellationToken) =>
 {
-    var options = new GetBooksOptions()
-    {
-        Ids = ids,
-        SortBy = sortBy?.Trim('+', '-'),
-        SortingOrder = sortBy is null ? SortingOrder.Unsorted : sortBy.Trim().StartsWith('+') ? SortingOrder.Ascending : SortingOrder.Descending,
-        Page = page ?? 1,
-        PageSize = pageSize ?? 30
-    };
-    
-    var validationResult = validator.Validate(options);
-
-    if (!validationResult.IsValid)
-    {
-        return Results.ValidationProblem(validationResult.ToDictionary());
-    }
-
     var books = await booksService.GetBooks(options, cancellationToken);
     var count = await booksService.GetCountAsync(cancellationToken);
-    
-    var response = new BooksResponse()
-    {
-        Items = books.Select(x => mapper.Map<BookResponse>(x)),
-        Page = options.Page,
-        PageSize = options.PageSize,
-        Total = count
-    };
 
-    return Results.Ok(response);
+    return Results.Ok(books.ToBooksResponse(options, count));
 })
 .RequireRateLimiting("ApiKeyRateLimit")
+.AddEndpointFilter<ValidationFilter<GetBooksOptions>>()
+.CacheOutput("ShortTerm")
 .WithName("GetBooks")
 .WithOpenApi();
 
-app.MapGet("/books/{id}", async (int id, IMapper mapper, IBooksService booksService, CancellationToken cancellationToken) =>
+app.MapGet("/books/{id}", async (int id, IBooksService booksService, CancellationToken cancellationToken) =>
 {
     var book = await booksService.GetBook(id, cancellationToken);
     
     if (book is null)
         return Results.NotFound($"Book with the id {id} was not found");
 
-    return Results.Ok(mapper.Map<BookResponse>(book));
+    return Results.Ok(book.ToBookResponse());
 })
 .RequireRateLimiting("ApiKeyRateLimit")
+.CacheOutput("ShortTerm")
 .WithName("GetBook")
 .WithOpenApi();
 
