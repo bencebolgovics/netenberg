@@ -1,4 +1,4 @@
-﻿namespace Netenberg.Model.Models;
+﻿namespace Netenberg.Model.Options;
 
 public sealed record DatabaseOptions
 {

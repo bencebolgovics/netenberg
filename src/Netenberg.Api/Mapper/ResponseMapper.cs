@@ -1,6 +1,6 @@
 ﻿using Netenberg.Contracts.Responses;
 using Netenberg.Model.Entities;
-using Netenberg.Model.Models;
+using Netenberg.Model.Options;
 
 namespace Netenberg.Api.Mapper;
 

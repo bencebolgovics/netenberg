@@ -4,7 +4,7 @@ using Netenberg.Api.Configuration;
 using Netenberg.Api.Mapper;
 using Netenberg.Api.Validation;
 using Netenberg.Application.Services;
-using Netenberg.Model.Models;
+using Netenberg.Model.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -3,7 +3,7 @@ using MongoDB.Driver;
 using Netenberg.Database.DatabaseContext;
 using Netenberg.Database.Extensions;
 using Netenberg.Model.Entities;
-using Netenberg.Model.Models;
+using Netenberg.Model.Options;
 
 namespace Netenberg.Database.Repositories;
 

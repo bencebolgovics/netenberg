@@ -7,7 +7,7 @@ using Netenberg.Application.Services;
 using Netenberg.Application.Validators;
 using Netenberg.Database.DatabaseContext;
 using Netenberg.Database.Repositories;
-using Netenberg.Model.Models;
+using Netenberg.Model.Options;
 using Quartz;
 using Quartz.Impl;
 using System.Threading.RateLimiting;

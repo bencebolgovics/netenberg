@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Netenberg.Model.Models;
+using Netenberg.Model.Options;
 
 namespace Netenberg.Application.Validators;
 

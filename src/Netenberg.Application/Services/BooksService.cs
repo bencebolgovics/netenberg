@@ -1,6 +1,6 @@
 ﻿using Netenberg.Database.Repositories;
 using Netenberg.Model.Entities;
-using Netenberg.Model.Models;
+using Netenberg.Model.Options;
 
 namespace Netenberg.Application.Services;
 
