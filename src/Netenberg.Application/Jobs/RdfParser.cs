@@ -1,7 +1,7 @@
 ﻿using Netenberg.Model.Entities;
 using System.Xml.Linq;
 
-namespace Netenberg.DataUpdater;
+namespace Netenberg.Application.Jobs;
 
 public class RdfParser
 {

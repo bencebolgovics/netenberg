@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.DataUpdater", "Netenberg.DataUpdater\Netenberg.DataUpdater.csproj", "{7D08BF06-9CA4-4A1C-8419-88A931664AC5}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Model", "Netenberg.Model\Netenberg.Model.csproj", "{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Netenberg.Database", "Netenberg.Database\Netenberg.Database.csproj", "{D7C8CA2E-A127-41C8-AADC-725BC1825834}"
@@ -21,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D08BF06-9CA4-4A1C-8419-88A931664AC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{38B6E2F5-AA4F-40B4-8095-2F498B09B6A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -45,12 +39,6 @@ Global
 		{5CD16754-57D4-4327-9A7B-62541CE9E169}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CD16754-57D4-4327-9A7B-62541CE9E169}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CD16754-57D4-4327-9A7B-62541CE9E169}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCC99E5A-BDD5-BE06-9857-B4DE76F6C702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCC99E5A-BDD5-BE06-9857-B4DE76F6C702}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCC99E5A-BDD5-BE06-9857-B4DE76F6C702}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{CCC99E5A-BDD5-BE06-9857-B4DE76F6C702}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCC99E5A-BDD5-BE06-9857-B4DE76F6C702}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCC99E5A-BDD5-BE06-9857-B4DE76F6C702}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

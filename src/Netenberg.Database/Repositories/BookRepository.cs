@@ -40,7 +40,7 @@ public sealed class BookRepository : IBookRepository
 
     public async Task<List<Book>> GetAll(GetBooksOptions options, CancellationToken cancellationToken)
     {
-        IQueryable<Book> query = _dbContext.Books;
+        IQueryable<Book> query = _dbContext.Books.AsNoTracking();
 
         if (!string.IsNullOrEmpty(options.Ids))
         {
@@ -60,17 +60,20 @@ public sealed class BookRepository : IBookRepository
     
     public async Task<Book?> GetById(int id, CancellationToken cancellationToken)
     {
-        return await _dbContext.Books.FirstOrDefaultAsync(b => b.GutenbergId == id, cancellationToken);
+        return await _dbContext.Books.AsNoTracking()
+            .FirstOrDefaultAsync(b => b.GutenbergId == id, cancellationToken);
     }
 
     public async Task<bool> Exists(int id, CancellationToken cancellationToken)
     {
-        return await _dbContext.Books.AnyAsync(b => b.GutenbergId == id, cancellationToken);
+        return await _dbContext.Books.AsNoTracking()
+            .AnyAsync(b => b.GutenbergId == id, cancellationToken);
     }
 
     public async Task<int> GetCountAsync(CancellationToken cancellationToken)
     {
-        return await _dbContext.Books.CountAsync(cancellationToken);
+        return await _dbContext.Books.AsNoTracking()
+            .CountAsync(cancellationToken);
     }
 
     public async Task<Book> Update(Book entity, CancellationToken cancellationToken)
